@@ -1,0 +1,409 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запис - Premium BarberShop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ОСНОВНІ СТИЛІ */
+        body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Open Sans', sans-serif; display: flex; flex-direction: column; min-height: 100vh;}
+        .main-content { flex: 1; }
+        h2 { font-family: 'Montserrat', sans-serif; color: #cda34f; font-weight: 700; text-transform: uppercase; text-align: center; margin-bottom: 20px;}
+        .booking-card { background: #141414; border: 1px solid #cda34f; border-radius: 10px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .form-label { color: #aaa; font-size: 0.9rem; margin-bottom: 5px; margin-top: 15px; }
+        
+        /* СТИЛЬ ДЛЯ БЕКЕНД ПОМИЛОК */
+        .error-message { color: #ff4757; font-size: 0.85rem; margin-top: 5px; font-weight: bold; }
+        
+        /* --- ЖИВІ ПІДКАЗКИ --- */
+        .hint-text { color: #aaa; font-size: 0.85rem; margin-top: 5px; font-weight: 600; transition: 0.3s; }
+        .hint-error { color: #ff4757 !important; }
+        .hint-valid { color: #28a745 !important; }
+        
+        .is-valid-input {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5) !important;
+        }
+
+        /* КНОПКИ */
+        .btn-gold { background-color: #cda34f; color: #000; font-family: 'Montserrat', sans-serif; font-weight: 700; padding: 15px; border-radius: 5px; width: 100%; border: none; text-transform: uppercase; transition: 0.3s; margin-top: 30px; text-align: center; display: inline-block; white-space: nowrap; }
+        .btn-gold:hover { background-color: #b58d3f; transform: scale(1.02); color: #000; }
+        
+        .btn-outline-gold { background: transparent; border: 1px solid #cda34f; color: #cda34f; font-family: 'Montserrat', sans-serif; font-weight: 700; padding: 15px; border-radius: 5px; text-transform: uppercase; transition: 0.3s; display: block; text-align: center; white-space: nowrap; }
+        .btn-outline-gold:hover { background: rgba(205, 163, 79, 0.1); color: #cda34f; }
+
+        .btn-header { background-color: transparent; border: 1px solid #cda34f; color: #cda34f; font-weight: bold; padding: 8px 20px; border-radius: 25px; transition: 0.3s; display: inline-block; white-space: nowrap; text-align: center; text-decoration: none;}
+        .btn-header:hover { background-color: #cda34f; color: #000 !important; }
+        
+        .btn-promo { background-color: #ff4757; color: #fff; font-weight: bold; border-radius: 25px; padding: 8px 20px; text-decoration: none; transition: 0.3s; border: 1px solid #ff4757; display: inline-block; white-space: nowrap; text-align: center;}
+        .btn-promo:hover { background-color: transparent; color: #ff4757; }
+
+        /* ФОРМА ТА СЕЛЕКТИ */
+        ::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        ::-placeholder { color: #555 !important; opacity: 1; }
+        select.form-select { padding-right: 35px !important; text-overflow: ellipsis; }
+        
+        select option {
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        /* МЕНЮ */
+        .navbar { background-color: #111; border-bottom: 2px solid #cda34f; padding: 15px 0;}
+        .navbar-brand { color: #fff !important; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.5rem; letter-spacing: 1px;}
+        .navbar-brand span { color: #cda34f; }
+        .nav-link { color: #ccc !important; font-weight: 600; text-transform: uppercase; margin: 0 10px; transition: 0.3s;}
+        .nav-link:hover { color: #cda34f !important; }
+        
+        /* КАРТКА МАЙСТРА */
+        #dynamic-barber-card { display: none; background: #1a1a1a; border: 1px dashed #cda34f; border-radius: 8px; padding: 30px; text-align: center; margin-top: 40px; transition: 0.3s; }
+        #dyn-photo { width: 180px; height: 180px; object-fit: cover; border-radius: 50%; border: 3px solid #cda34f; margin-bottom: 15px; }
+        .rating-stars { color: #cda34f; font-size: 1.3rem; margin-bottom: 15px; }
+        .review-box { background: #111; padding: 15px; border-left: 3px solid #cda34f; font-style: italic; font-size: 0.95rem; color: #bbb; text-align: left; margin-top: 20px; border-radius: 0 5px 5px 0;}
+        
+        /* ФУТЕР */
+        .footer { background-color: #111; border-top: 1px solid #333; padding: 40px 0 20px 0; color: #888; font-size: 0.9rem; margin-top: 60px;}
+        .footer h5 { color: #cda34f; font-family: 'Montserrat', sans-serif; text-transform: uppercase; margin-bottom: 20px; font-weight: 700;}
+        .work-hours { font-size: 1.05rem; margin-bottom: 5px; color: #ddd;}
+        .work-hours span { color: #cda34f; font-weight: bold;}
+
+        /* Адаптація для телефонів */
+        @media (max-width: 768px) {
+            .booking-card {
+                padding: 20px;
+            }
+            #dynamic-barber-card {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+{% include 'services/preloader.html' %}
+
+<nav class="navbar navbar-expand-xl">
+    <div class="container">
+        <a class="navbar-brand" href="/">Premium<span>Barber</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav align-items-center text-center">
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link" href="/">Головна</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link" href="/about/">Про нас</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link" href="/gallery/">Галерея</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link" href="/reviews/">Відгуки</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link btn-promo mx-xl-3" href="/promo/"><i class="fa-solid fa-fire"></i> Спеціальні пропозиції</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="btn-header ms-xl-2 text-decoration-none" style="color: #000 !important; background-color: #cda34f;" href="/book/">Онлайн Запис</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-7 mb-4">
+                
+                {% if booking_success %}
+                <div class="booking-card text-center" style="padding: 60px 20px;">
+                    <i class="fa-solid fa-hourglass-half" style="font-size: 5rem; color: #cda34f; margin-bottom: 20px; animation: pulse 1.5s infinite;"></i>
+                    <h2 style="font-size: 2.2rem; color: #fff;">Заявку відправлено!</h2>
+                    
+                    <p style="color: #aaa; font-size: 1.1rem; margin-bottom: 30px;">
+                        Адміністратор перевірить вільний час та підтвердить ваш запис.
+                    </p>
+
+                    <div style="background: #1a1a1a; border-left: 4px solid #cda34f; padding: 20px; margin: 0 auto 30px auto; max-width: 400px; text-align: left; border-radius: 4px;">
+                        <p style="font-size: 1.05rem; color: #e0e0e0; margin-bottom: 10px;">
+                            Статус: <strong style="color: #f39c12; background: rgba(243, 156, 18, 0.1); padding: 3px 8px; border-radius: 4px;">⏳ Очікує підтвердження</strong>
+                        </p>
+                        <p style="font-size: 1.05rem; color: #e0e0e0; margin-bottom: 10px;">Клієнт: <strong style="color: #fff;">{{ client_name }}</strong></p>
+                        <p style="font-size: 1.05rem; color: #e0e0e0; margin-bottom: 10px;">Майстер: <strong style="color: #fff;">{{ barber_name }}</strong></p>
+                        <p style="font-size: 1.05rem; color: #e0e0e0; margin-bottom: 0;">Час: <strong style="color: #cda34f;">{{ date|date:"d.m.Y" }}</strong> о <strong style="color: #cda34f;">{{ time|time:"H:i" }}</strong></p>
+                    </div>
+                    
+                    <div class="row mt-4 justify-content-center px-4">
+                        <div class="col-sm-6 mb-3">
+                            <a href="/" class="btn-gold d-block m-0" style="text-decoration: none;"><i class="fa-solid fa-house me-2"></i> На головну</a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="/book/" class="btn-outline-gold d-block w-100 text-center" style="text-decoration: none;"><i class="fa-solid fa-plus me-2"></i> Новий запис</a>
+                        </div>
+                    </div>
+                </div>
+                
+                {% else %}
+                <div class="booking-card">
+                    <h2>Оформити запис</h2>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success text-center" style="background: rgba(74, 222, 128, 0.1); border: 1px solid #4ade80; color: #4ade80; border-radius: 8px;">
+                                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <label class="form-label">Оберіть послугу:</label>
+                        {{ form.service }}
+
+                        <label class="form-label">Оберіть майстра:</label>
+                        {{ form.barber }}
+
+                        <label class="form-label">Ваше Ім'я:</label>
+                        {{ form.client_name }}
+                        <div id="name-hint" class="hint-text"><i class="fa-solid fa-circle-info"></i> Почніть вводити ім'я...</div>
+
+                        <label class="form-label">Телефон:</label>
+                        {{ form.client_phone }}
+                        <div id="phone-hint" class="hint-text"><i class="fa-solid fa-circle-info"></i> Введіть номер телефону...</div>
+
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <label class="form-label">Дата:</label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <div class="error-message">{{ form.date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Час:</label>
+                                {{ form.time }}
+                                {% if form.time.errors %}
+                                    <div class="error-message">{{ form.time.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-gold"><i class="fa-solid fa-paper-plane me-2"></i> Надіслати заявку</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-5">
+                <div id="dynamic-barber-card">
+                    <img id="dyn-photo" src="" alt="Фото майстра" style="display:none; margin: 0 auto 15px auto;">
+                    <h3 id="dyn-name" style="color: #fff; font-family: 'Montserrat', sans-serif;"></h3>
+                    <div class="rating-stars"><i class="fa-solid fa-star"></i> <span id="dyn-rating"></span> / 5.0</div>
+                    <p id="dyn-desc" style="color: #aaa; font-size: 1rem;"></p>
+                    <div class="review-box" id="dyn-reviews" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-lg-5 text-center text-md-start mb-4">
+                <h5>Premium BarberShop</h5>
+                <p>Місце, де створюється ваш ідеальний стиль.</p>
+                <div class="mt-4">
+                    <h5 style="color: #fff; font-size: 1rem;"><i class="fa-regular fa-clock" style="color: #cda34f;"></i> Графік роботи</h5>
+                    <p class="work-hours">Пн - Пт: <span>09:00 - 18:00</span></p>
+                    <p class="work-hours">Сб - Нд: <span>10:00 - 17:00</span></p>
+                    <p class="work-hours" style="font-size: 0.9rem;">Обідня перерва: <span>12:00 - 13:00</span></p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7 text-center text-md-start">
+                <h5 style="color: #fff; font-size: 1rem;"><i class="fa-solid fa-map-location-dot" style="color: #cda34f;"></i> Наша адреса (м. Полтава)</h5>
+                <div style="border-radius: 8px; overflow: hidden; border: 1px solid #333; margin-top: 15px;">
+                    <iframe src="https://maps.google.com/maps?q=Полтава,+вулиця+Соборності,+46&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4 pt-3" style="border-top: 1px solid #333;">
+            <div id="real-time-clock" style="font-size: 1.6rem; color: #cda34f; font-family: 'Montserrat', sans-serif; font-weight: bold; margin-bottom: 2px;">--:--:--</div>
+            <div id="real-time-date" style="font-size: 1rem; color: #aaa; margin-bottom: 15px; text-transform: capitalize;">-- -- ----</div>
+            <p style="font-size: 0.8rem;">© 2026 Premium BarberShop. Всі права захищені. Розроблено для курсової роботи.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ГОДИННИК ТА ДАТА
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('real-time-clock').innerText = now.toLocaleTimeString('uk-UA');
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('real-time-date').innerText = now.toLocaleDateString('uk-UA', options);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ЖИВА ВАЛІДАЦІЯ ТЕЛЕФОНУ ТА ІМЕНІ
+    const phoneInput = document.getElementById('phone-input');
+    const nameInput = document.getElementById('name-input');
+    const phoneHint = document.getElementById('phone-hint');
+    const nameHint = document.getElementById('name-hint');
+
+    if (phoneInput) {
+        phoneInput.addEventListener('focus', function() { 
+            if (this.value.length < 4) {
+                this.value = '+380';
+                phoneHint.className = 'hint-text hint-error';
+                phoneHint.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Невірний формат. Номер має містити 13 символів';
+            }
+        });
+        
+        phoneInput.addEventListener('input', function(e) {
+            let pureNumber = this.value.replace(/\D/g, '');
+            if (pureNumber.startsWith('380')) pureNumber = pureNumber.substring(3);
+            this.value = '+380' + pureNumber.substring(0, 9);
+            
+            if (this.value.length === 13) {
+                this.classList.add('is-valid-input');
+                if(phoneHint) {
+                    phoneHint.className = 'hint-text hint-valid';
+                    phoneHint.innerHTML = `<i class="fa-solid fa-circle-check"></i> Номер введено правильно`;
+                }
+            } else {
+                this.classList.remove('is-valid-input');
+                if(phoneHint) {
+                    phoneHint.className = 'hint-text hint-error';
+                    phoneHint.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Невірний формат. Номер має містити 13 символів`;
+                }
+            }
+        });
+
+        phoneInput.addEventListener('keydown', function(e) {
+            if (this.selectionStart <= 4 && (e.key === 'Backspace' || e.key === 'Delete')) e.preventDefault();
+        });
+    }
+
+    if (nameInput) {
+        nameInput.addEventListener('input', function() { 
+            this.value = this.value.replace(/[^a-zA-Zа-яА-ЯіІїЇєЄґҐ\s\-\']/g, ''); 
+            
+            if (this.value.trim().length >= 2) {
+                this.classList.add('is-valid-input');
+                if(nameHint) {
+                    nameHint.className = 'hint-text hint-valid';
+                    nameHint.innerHTML = `<i class="fa-solid fa-circle-check"></i> Ім'я введено правильно`;
+                }
+            } else {
+                this.classList.remove('is-valid-input');
+                if(nameHint) {
+                    nameHint.className = 'hint-text hint-error';
+                    nameHint.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Ім'я має містити щонайменше 2 літери!`;
+                }
+            }
+        });
+    }
+
+    // ЛОГІКА ВИБОРУ ДАТИ ТА ЧАСУ
+    const dateInput = document.getElementById('id_date');
+    const timeSelect = document.getElementById('id_time');
+    
+    if (dateInput && timeSelect) {
+        const today = new Date();
+        const maxDate = new Date(); maxDate.setMonth(today.getMonth() + 2);
+        const formatDate = (d) => { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+        dateInput.min = formatDate(today); 
+        dateInput.max = formatDate(maxDate);
+
+        dateInput.addEventListener('change', function() {
+            if (this.value) this.classList.add('is-valid-input');
+            timeSelect.innerHTML = ''; 
+            if (!this.value) { timeSelect.innerHTML = '<option value="">Спочатку оберіть дату...</option>'; return; }
+
+            const selectedDate = new Date(this.value);
+            const isWeekend = (selectedDate.getDay() === 0 || selectedDate.getDay() === 6);
+            const isToday = (selectedDate.toDateString() === today.toDateString());
+            let startHour = isWeekend ? 10 : 9; 
+            let endHour = isWeekend ? 16 : 17;
+            let timesAvailable = 0;
+            
+            timeSelect.innerHTML = '<option value="">-- Оберіть час --</option>';
+
+            for (let h = startHour; h <= endHour; h++) {
+                if (h === 12) continue;
+                for (let m of ['00', '30']) {
+                    if (isToday && (h < today.getHours() || (h === today.getHours() && parseInt(m) <= today.getMinutes()))) continue;
+                    let timeStr = `${String(h).padStart(2, '0')}:${m}`;
+                    let option = document.createElement('option');
+                    option.value = timeStr; 
+                    option.text = timeStr;
+                    timeSelect.appendChild(option); 
+                    timesAvailable++;
+                }
+            }
+            if (timesAvailable === 0) timeSelect.innerHTML = '<option value="">Вільних місць немає</option>';
+        });
+        
+        timeSelect.addEventListener('change', function() {
+            if (this.value) this.classList.add('is-valid-input');
+        });
+    }
+
+    // ДАНІ ПРО МАЙСТРІВ
+    const barbersData = {
+        {% for barber in barbers %}
+        "{{ barber.id }}": {
+            "name": "{{ barber.name|escapejs }}", 
+            "photo": "{% if barber.photo %}{{ barber.photo.url }}{% else %}''{% endif %}",
+            "desc": "{{ barber.description|escapejs }}", 
+            "rating": "{{ barber.average_rating }}", 
+            "reviews": "{{ barber.reviews_text|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    const barberSelect = document.getElementById('id_barber');
+    const serviceSelect = document.getElementById('id_service');
+
+    if (barberSelect) {
+        barberSelect.addEventListener('change', function() {
+            if (this.value) this.classList.add('is-valid-input');
+            const data = barbersData[this.value];
+            if (data) {
+                document.getElementById('dyn-name').innerText = data.name; 
+                document.getElementById('dyn-desc').innerText = data.desc;
+                document.getElementById('dyn-rating').innerText = data.rating; 
+                document.getElementById('dyn-photo').src = data.photo || '';
+                document.getElementById('dyn-photo').style.display = data.photo ? 'block' : 'none';
+                const reviewsBox = document.getElementById('dyn-reviews');
+                if (reviewsBox) {
+                    reviewsBox.innerHTML = data.reviews ? `<strong>🗣 Відгуки:</strong><br>\"${data.reviews}\"` : '';
+                    reviewsBox.style.display = data.reviews ? 'block' : 'none';
+                }
+                document.getElementById('dynamic-barber-card').style.display = 'block';
+            } else { 
+                document.getElementById('dynamic-barber-card').style.display = 'none'; 
+            }
+        });
+    }
+
+    if (serviceSelect) {
+        serviceSelect.addEventListener('change', function() {
+            if (this.value) this.classList.add('is-valid-input');
+        });
+    }
+
+    // АВТОВИБІР ПОСЛУГИ З ПОСИЛАННЯ (Розумна кнопка)
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceId = urlParams.get('service');
+        
+        if (serviceId) {
+            if (serviceSelect) {
+                serviceSelect.value = serviceId;
+                serviceSelect.dispatchEvent(new Event('change'));
+            }
+        }
+    });
+</script>
+</body>
+</html>

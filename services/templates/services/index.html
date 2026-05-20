@@ -1,0 +1,361 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Головна - Premium BarberShop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ОСНОВНІ СТИЛІ */
+        body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Open Sans', sans-serif; display: flex; flex-direction: column; min-height: 100vh;}
+        .main-content { flex: 1; }
+        
+        /* МЕНЮ */
+        .navbar { background-color: #111; border-bottom: 2px solid #cda34f; padding: 15px 0;}
+        .navbar-brand { color: #fff !important; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.5rem; letter-spacing: 1px;}
+        .navbar-brand span { color: #cda34f; }
+        .nav-link { color: #ccc !important; font-weight: 600; text-transform: uppercase; margin: 0 10px; transition: 0.3s;}
+        .nav-link:hover, .nav-link.active { color: #cda34f !important; }
+        
+        /* КНОПКИ */
+        .btn-header { background-color: transparent; border: 1px solid #cda34f; color: #cda34f; font-weight: bold; padding: 8px 20px; border-radius: 25px; transition: 0.3s; display: inline-block; white-space: nowrap; text-align: center; text-decoration: none;}
+        .btn-header:hover { background-color: #cda34f; color: #000; }
+        
+        .btn-promo { 
+            background-color: transparent !important; 
+            color: #ff4757 !important; 
+            font-weight: bold; 
+            border-radius: 25px; 
+            padding: 8px 20px; 
+            text-decoration: none; 
+            border: 1px solid #ff4757; 
+            display: inline-block; 
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+        .btn-promo:hover { background-color: #ff4757 !important; color: #fff !important; }
+
+        .btn-gold { background-color: #cda34f; color: #000; font-family: 'Montserrat', sans-serif; font-weight: 700; padding: 12px 30px; border-radius: 5px; text-transform: uppercase; transition: 0.3s; text-decoration: none; display: inline-block;}
+        .btn-gold:hover { background-color: #b58d3f; color: #000; transform: scale(1.02); }
+
+        /* ГОЛОВНИЙ БАНЕР */
+        .hero-section { background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1600&q=80') center/cover; padding: 100px 0; text-align: center; border-bottom: 1px solid #333;}
+        .hero-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 3.5rem; color: #fff; margin-bottom: 20px;}
+        .hero-title span { color: #cda34f; }
+        .hero-subtitle { font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
+
+        /* СТИЛІ ФІЛЬТРІВ */
+        .filters-container { margin-bottom: 35px; }
+        .filter-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #cda34f;
+            padding: 8px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: #cda34f;
+            color: #000;
+        }
+
+        /* КАРТКИ ПОСЛУГ */
+        .service-card { background: #141414; border: 1px solid #333; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; height: 100%; display: flex; flex-direction: column; position: relative;}
+        .service-card:hover { border-color: #cda34f; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(205, 163, 79, 0.15); }
+        
+        .service-card.promo-card { border-color: #444; }
+        .service-card.promo-card:hover { border-color: #ff4757; box-shadow: 0 10px 25px rgba(255, 71, 87, 0.2); }
+
+        /* ВИПРАВЛЕННЯ ФОТОГРАФІЙ В СІТЦІ (висота 300px, фокус на обличчі) */
+        .service-img-box { width: 100%; height: 300px; background: #222; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;}
+        .service-img-box img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; transition: 0.5s; }
+        .service-card:hover .service-img-box img { transform: scale(1.05); }
+
+        /* СТРІЧКА АКЦІЯ */
+        .ribbon-wrapper { width: 130px; height: 130px; overflow: hidden; position: absolute; top: -10px; right: -10px; z-index: 10; }
+        .ribbon { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.75rem; color: #fff; text-align: center; text-transform: uppercase; transform: rotate(45deg); position: relative; padding: 7px 0; right: -20px; top: 25px; width: 170px; background-color: #ff4757; box-shadow: 0 5px 10px rgba(0,0,0,0.4); letter-spacing: 1px; }
+
+        /* ТАЙМЕР НА КАРТЦІ */
+        .timer-box { background: rgba(255, 71, 87, 0.08); border: 1px solid rgba(255, 71, 87, 0.2); border-radius: 8px; padding: 10px; margin: 10px 0; text-align: center; }
+        .promo-timer { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #ff4757; font-size: 0.85rem; }
+
+        /* ФУТЕР */
+        .footer { background-color: #111; border-top: 1px solid #333; padding: 40px 0 20px 0; color: #888; font-size: 0.9rem; margin-top: 60px;}
+        .footer h5 { color: #cda34f; font-family: 'Montserrat', sans-serif; text-transform: uppercase; margin-bottom: 20px; font-weight: 700;}
+        .work-hours { font-size: 1.05rem; margin-bottom: 5px; color: #ddd;}
+        .work-hours span { color: #cda34f; font-weight: bold;}
+        
+   /* ФУТЕР */
+        .footer { background-color: #111; border-top: 1px solid #333; padding: 40px 0 20px 0; color: #888; font-size: 0.9rem; margin-top: 60px;}
+        .footer h5 { color: #cda34f; font-family: 'Montserrat', sans-serif; text-transform: uppercase; margin-bottom: 20px; font-weight: 700;}
+        .work-hours { font-size: 1.05rem; margin-bottom: 5px; color: #ddd;}
+        .work-hours span { color: #cda34f; font-weight: bold;}
+        
+        /* Адаптация для телефонов */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.2rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .service-card { margin: 0 10px; }
+            .filter-btn { padding: 6px 12px; font-size: 0.75rem; margin: 3px; }
+        }
+
+    </style>
+    
+</head>
+<body>
+
+{% include 'services/preloader.html' %}
+
+<nav class="navbar navbar-expand-xl">
+    <div class="container">
+        <a class="navbar-brand" href="/">Premium<span>Barber</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav align-items-center text-center">
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link active" href="/">Головна</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link" href="/about/">Про нас</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link" href="/gallery/">Галерея</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link" href="/reviews/">Відгуки</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="nav-link btn-promo mx-xl-3" href="/promo/"><i class="fa-solid fa-fire"></i> Спеціальні пропозиції</a></li>
+                <li class="nav-item my-2 my-xl-0"><a class="btn-header ms-xl-2 text-decoration-none" href="/book/">Онлайн Запис</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">Premium <span>BarberShop</span></h1>
+        <p class="hero-subtitle">Твій стиль. Твоя впевненість. Твоя територія.</p>
+        <a href="/book/" class="btn-gold"><i class="fa-regular fa-calendar-check me-2"></i> Записатися зараз</a>
+    </div>
+</header>
+
+<div class="main-content">
+    <div class="container py-5">
+        <div class="text-center mb-4">
+            <h2 style="font-family: 'Montserrat', sans-serif; color: #cda34f; font-weight: 700; text-transform: uppercase;">Наші Послуги</h2>
+            <p style="color: #aaa;">Натисніть на послугу, щоб дізнатися деталі.</p>
+        </div>
+
+        <div class="filters-container text-center">
+            <button class="filter-btn active" data-filter="all">Всі послуги</button>
+            {% for category in categories %}
+                <button class="filter-btn" data-filter="cat-{{ category.id }}">{{ category.name }}</button>
+            {% endfor %}
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            {% for service in services %}
+            
+            <div class="col-md-6 col-lg-4 service-col" data-category="{% if service.category %}cat-{{ service.category.id }}{% else %}cat-none{% endif %}">
+                <div class="service-card {% if service.is_promo %}promo-card{% endif %}" data-bs-toggle="modal" data-bs-target="#serviceModal{{ service.id }}">
+                    
+                    {% if service.is_promo %}
+                        <div class="ribbon-wrapper"><div class="ribbon">Акція</div></div>
+                    {% endif %}
+                    
+                    <div class="service-img-box">
+                        {% if service.photo %}
+                            <img src="{{ service.photo.url }}" alt="{{ service.name }}">
+                        {% else %}
+                            <i class="fa-solid fa-scissors fa-4x" style="color: #444;"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="padding: 25px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            {% if service.is_promo %}
+                                <h5 style="color: #fff; font-family: 'Montserrat', sans-serif; font-weight: bold;"><i class="fa-solid fa-fire me-2" style="color: #ff4757;"></i>{{ service.name }}</h5>
+                                <div class="timer-box">
+                                    <div class="promo-timer" data-end-time="{% if service.promo_end_date %}{{ service.promo_end_date|date:'Y-m-d\TH:i:s' }}{% endif %}">
+                                        <i class="fa-solid fa-hourglass-half fa-spin"></i> Рахуємо час...
+                                    </div>
+                                </div>
+                            {% else %}
+                                <h5 style="color: #fff; font-family: 'Montserrat', sans-serif; font-weight: bold;">{{ service.name }}</h5>
+                                <p style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">Тривалість: {{ service.duration_min }} хв</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-2">
+                            {% if service.is_promo and service.old_price %}
+                                <span style="color: #888; text-decoration: line-through; font-size: 0.9rem; margin-right: 8px;">{{ service.old_price }} ₴</span>
+                            {% endif %}
+                            <h4 style="color: #cda34f; font-weight: bold; margin: 0; display: inline-block;">{{ service.price }} ₴</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="serviceModal{{ service.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="background-color: #111; border: 1px solid {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %}; border-radius: 12px; overflow: hidden;">
+                        
+                        <div class="modal-header" style="border-bottom: 1px solid #333; background: #0a0a0a;">
+                            <h5 class="modal-title" style="color: {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %}; font-family: 'Montserrat', sans-serif; font-weight: bold;">
+                                {% if service.is_promo %}<i class="fa-solid fa-fire me-2"></i>{% endif %}{{ service.name }}
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                        </div>
+                        
+                        <div class="modal-body" style="color: #ccc; padding: 25px;">
+                            {% if service.photo %}
+                                <img src="{{ service.photo.url }}" style="width: 100%; height: 350px; object-fit: cover; object-position: center 15%; border-radius: 8px; margin-bottom: 20px; border: 1px solid #222;" alt="{{ service.name }}">
+                            {% endif %}
+                            
+                            <div style="background: #1a1a1a; padding: 15px; border-left: 3px solid {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %}; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+                                <p style="margin-bottom: 0; font-size: 0.95rem; line-height: 1.6;">
+                                    {% if service.description %}{{ service.description }}{% else %}Професійна процедура від наших майстрів.{% endif %}
+                                </p>
+                            </div>
+
+                            <ul style="list-style: none; padding: 0; margin-bottom: 0;">
+                                <li style="margin-bottom: 12px; font-size: 1.05rem;">
+                                    <i class="fa-solid fa-stopwatch me-2" style="color: {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %};"></i> 
+                                    <strong>Час виконання:</strong> <span style="color: #fff;">{{ service.duration_min }} хв</span>
+                                </li>
+                                <li style="margin-bottom: 12px; font-size: 1.05rem;">
+                                    <i class="fa-solid fa-layer-group me-2" style="color: {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %};"></i> 
+                                    <strong>Складність:</strong> <span style="color: #fff;">{{ service.get_difficulty_display }}</span>
+                                </li>
+                                <li style="font-size: 1.05rem;">
+                                    <i class="fa-solid fa-money-bill-wave me-2" style="color: {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %};"></i> 
+                                    <strong>Вартість:</strong> 
+                                    {% if service.is_promo and service.old_price %}
+                                        <span style="color: #888; text-decoration: line-through; font-size: 0.9rem; margin-right: 5px;">{{ service.old_price }} ₴</span>
+                                    {% endif %}
+                                    <span style="font-size: 1.3rem; color: {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %}; font-weight: bold;">{{ service.price }} ₴</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="modal-footer" style="border-top: 1px solid #333; padding: 20px; background: #0a0a0a;">
+                            <a href="/book/?service={{ service.id }}" class="btn w-100" style="background-color: {% if service.is_promo %}#ff4757{% else %}#cda34f{% endif %}; color: {% if service.is_promo %}#fff{% else %}#000{% endif %}; font-family: 'Montserrat', sans-serif; font-weight: bold; text-transform: uppercase; padding: 12px; border-radius: 6px; transition: 0.3s;">
+                                {% if service.is_promo %}Записатися по акції{% else %}Записатися на цю послугу{% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-lg-5 text-center text-md-start mb-4">
+                <h5>Premium BarberShop</h5>
+                <p>Місце, де створюється ваш ідеальний стиль.</p>
+                <div class="mt-4">
+                    <h5 style="color: #fff; font-size: 1rem;"><i class="fa-regular fa-clock" style="color: #cda34f;"></i> Графік роботи</h5>
+                    <p class="work-hours">Пн - Пт: <span>09:00 - 18:00</span></p>
+                    <p class="work-hours">Сб - Нд: <span>10:00 - 17:00</span></p>
+                    <p class="work-hours" style="font-size: 0.9rem;">Обідня перерва: <span>12:00 - 13:00</span></p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7 text-center text-md-start">
+                <h5 style="color: #fff; font-size: 1rem;"><i class="fa-solid fa-map-location-dot" style="color: #cda34f;"></i> Наша адреса (м. Полтава)</h5>
+                <div style="border-radius: 8px; overflow: hidden; border: 1px solid #333; margin-top: 15px;">
+                    <iframe src="https://maps.google.com/maps?q=Полтава,+вулиця+Соборності,+46&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4 pt-3" style="border-top: 1px solid #333;">
+            <div id="real-time-clock" style="font-size: 1.6rem; color: #cda34f; font-family: 'Montserrat', sans-serif; font-weight: bold; margin-bottom: 2px;">--:--:--</div>
+            <div id="real-time-date" style="font-size: 1rem; color: #aaa; margin-bottom: 15px; text-transform: capitalize;">-- -- ----</div>
+            <p style="font-size: 0.8rem;">© 2026 Premium BarberShop. Всі права захищені. Розроблено для курсової роботи.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Годинник
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('real-time-clock').innerText = now.toLocaleTimeString('uk-UA');
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('real-time-date').innerText = now.toLocaleDateString('uk-UA', options);
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    // Таймер для акцій
+    function updateCountdowns() {
+        const timers = document.querySelectorAll('.promo-timer');
+        const now = new Date().getTime();
+
+        timers.forEach(timer => {
+            const endDateStr = timer.getAttribute('data-end-time');
+            const cardContainer = timer.closest('.col-md-6'); 
+            
+            if (!endDateStr || endDateStr === 'None' || endDateStr === '') return;
+
+            const endDate = new Date(endDateStr).getTime();
+            const distance = endDate - now;
+
+            if (distance < 0) {
+                if (cardContainer) {
+                    cardContainer.style.display = 'none';
+                }
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timer.innerHTML = `<i class="fa-regular fa-clock me-2"></i>${days}д ${hours}г ${minutes}хв ${seconds}с`;
+        });
+    }
+    
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+
+    // СКРИПТ ФІЛЬТРАЦІЇ ПО БАЗІ ДАНИХ (ID категорій)
+    document.addEventListener("DOMContentLoaded", function() {
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const serviceCols = document.querySelectorAll('.service-col');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Міняємо колір активної кнопки
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Отримуємо ID категорії 
+                const filterValue = button.getAttribute('data-filter');
+
+                // Проходимось по всіх картках
+                serviceCols.forEach(col => {
+                    const cardCategory = col.getAttribute('data-category'); // Дістаємо її ID
+                    
+                    if (filterValue === 'all' || cardCategory === filterValue) {
+                        col.style.display = 'block'; // Показуємо
+                    } else {
+                        col.style.display = 'none'; // Ховаємо
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
